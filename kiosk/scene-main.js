@@ -70,6 +70,23 @@ export default () => {
       (sSpikesFixed2.basedH * (1 - spikesFixed2Scale)) * (spikesAnchor - 0.5)
   }
 
+  let socket
+  const reconnect = () => {
+    socket = new WebSocket(
+      (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
+      window.location.host + window.location.pathname)
+    socket.onopen = () => {}
+    socket.onclose = () => {
+      socket = undefined
+      setTimeout(() => reconnect(), 1000)
+    }
+    socket.onmessage = (e) => {
+      const text = e.data
+      console.log(text)
+    }
+  }
+  reconnect()
+
   return {
     update,
     group,
