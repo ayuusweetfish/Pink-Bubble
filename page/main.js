@@ -66,7 +66,14 @@ two.bind('update', update).play()
 }
 
 const loadingElement = document.getElementById('loading')
-loadImages(function (count, total) {
+loadImages([
+  'girl-1',
+  'girl-2',
+  'girl-3',
+  'bubble-1',
+  'bubble-2',
+  'bubble-3',
+], function (count, total) {
   loadingElement.style.fontSize = `${document.body.clientHeight * 0.03}px`
   loadingElement.innerText = `加载中~ (${Math.round(count / total * 100)}%)`
   if (count === total) {

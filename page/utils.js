@@ -1,10 +1,5 @@
 const texRegistry = {}
-export const loadImages = function (callback) {
-  const images = [
-    'girl-1',
-    'girl-2',
-    'girl-3',
-  ]
+export const loadImages = function (images, callback) {
   let count = 0
   for (const name of images) {
     const i = new Image()
@@ -23,7 +18,7 @@ export const loadImages = function (callback) {
   }
 }
 
-export const createSprite = function (name, w, h) {
+export const createSprite = function (name, w, h, ax, ay) {
   const tex = texRegistry[name]
   const w0 = tex._image.width
   const h0 = tex._image.height
@@ -46,11 +41,12 @@ export const createSprite = function (name, w, h) {
     xScale = yScale = 1
   }
 
-  sprite.setScale = function (x, y) {
+  sprite.aspectRatio = (w0 * xScale) / (h0 * yScale)
+  sprite.setBasedScale = function (x, y) {
     if (!isFinite(y)) y = x
     this.scale = new Two.Vector(x * xScale, y * yScale)
   }
-  sprite.setScale(1)
+  sprite.setBasedScale(1)
   sprite.texture = tex
   if (name === 'peach_1f351') window.qwqwq = sprite
 
