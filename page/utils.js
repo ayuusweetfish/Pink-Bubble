@@ -41,7 +41,8 @@ export const createSprite = function (name, w, h, ax, ay) {
     xScale = yScale = 1
   }
 
-  sprite.aspectRatio = (w0 * xScale) / (h0 * yScale)
+  sprite.basedW = w0 * xScale
+  sprite.basedH = h0 * yScale
   sprite.setBasedScale = function (x, y) {
     if (!isFinite(y)) y = x
     this.scale = new Two.Vector(x * xScale, y * yScale)

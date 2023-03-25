@@ -73,6 +73,9 @@ loadImages([
   'bubble-1',
   'bubble-2',
   'bubble-3',
+  'spikes-1',
+  'spikes-2',
+  'spikes-3',
 ], function (count, total) {
   loadingElement.style.fontSize = `${document.body.clientHeight * 0.03}px`
   loadingElement.innerText = `加载中~ (${Math.round(count / total * 100)}%)`
