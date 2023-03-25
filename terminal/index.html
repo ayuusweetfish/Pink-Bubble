@@ -3,18 +3,21 @@
   <meta charset='utf-8'>
 </head><body style='background: hsl(0, 100%, 99%)'>
   <script>
+const uuid = crypto.randomUUID()
+
 let socket
 const reconnect = () => {
   socket = new WebSocket(
     (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
-    window.location.host + window.location.pathname)
+    window.location.host + window.location.pathname +
+    '?' + uuid)
   socket.onopen = () => {}
   socket.onclose = () => {
     socket = undefined
     setTimeout(() => reconnect(), 1000)
   }
   socket.onmessage = (e) => {
-    const text = e.data
+    const text = JSON.parse(e.data)
     console.log(text)
   }
 }

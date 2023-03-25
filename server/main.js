@@ -8,7 +8,11 @@ log(`Running at http://localhost:${port}/`)
 
 const kioskSockets = new Set()
 const terminalSockets = new Set()
-const unicastCount = (s) => s.send(`C${terminalSockets.size}`)
+const unicastCount = (s) => {
+  const ids = []
+  for (const s of terminalSockets) ids.push(s.uuid)
+  s.send('L' + ids.join(','))
+}
 const broadcastCount = () => { for (const s of kioskSockets) unicastCount(s) }
 
 const serveReq = (req) => {
@@ -16,8 +20,9 @@ const serveReq = (req) => {
   if (req.headers.get('Upgrade') === 'websocket') {
     const { socket, response } = Deno.upgradeWebSocket(req)
     const isKiosk = (url.pathname === '/kiosk/')
+    socket.uuid = url.search.substring(1)
     socket.onopen = () => {
-      log(`Connected ${url.pathname}`)
+      log(`Connected ${url.pathname} ${socket.uuid}`)
       if (isKiosk) {
         kioskSockets.add(socket)
         unicastCount(socket)
