@@ -13,13 +13,18 @@ export default () => {
     return s
   }
 
+  const bubbleAnchor = 0.82
+  const spikesAnchor = 0.56
+
   const sGirl = ['girl-1', 'girl-2', 'girl-3'].map(spriteHere)
-/*
-  const sSpikesFixed = spriteHere('spikes-2')
-  sSpikesFixed.opacity = 0.2
-  sSpikesFixed.setBasedScale(-1.1, 1.1)
-*/
+  const sSpikesFixed1 = spriteHere('spikes-1')
+  sSpikesFixed1.opacity = 0.05
+  sSpikesFixed1.setBasedScale(1.2)
+  sSpikesFixed1.translation.y = H / 2 +
+    (sSpikesFixed1.basedH * (1 - 1.2)) * (spikesAnchor - 0.5)
+  const sSpikesFixed2 = spriteHere('spikes-2')
   const sSpikes = ['spikes-1', 'spikes-2', 'spikes-3'].map(spriteHere)
+  for (const s of sSpikes) s.opacity = 0.8
   const sBubble = ['bubble-1', 'bubble-2', 'bubble-3'].map(spriteHere)
 
   let T = 0
@@ -41,20 +46,28 @@ export default () => {
 
     T = (T + 1) % 1800
     const sBubbleCur = sBubble[sBubbleIndex]
-    const bubbleScaleReal = 1 - 0.2 * Math.cos(T / 1800 * Math.PI * 2)
+    const x = Math.cos(T / 1800 * Math.PI * 2)
+    const bubbleScaleReal = 1 - 0.2 * Math.pow(Math.abs(x), 0.85) * Math.sign(x)
     const bubbleScale = Math.round(bubbleScaleReal * 30) / 30
     sBubbleCur.setBasedScale(bubbleScale)
-    const bubbleAnchor = 0.82
     sBubbleCur.translation.y = H / 2 +
       (sBubbleCur.basedH * (1 - bubbleScale)) * (bubbleAnchor - 0.5)
 
     const sSpikesIndex =
-      (Math.max(0, Math.min(2, Math.round((1.02 - bubbleScale) / 0.12))))
+      (Math.max(0, Math.min(2, Math.round((1.04 - bubbleScaleReal) / 0.12))))
     for (let i = 0; i < 3; i++) sSpikes[i].visible = (i === sSpikesIndex)
     const sSpikesCur = sSpikes[sSpikesIndex]
-    const spikeScaleReal = 1 + (bubbleScaleReal - 1) * 0.2
-    const spikeScale = Math.round(spikeScaleReal * 20) / 20
-    sSpikesCur.setBasedScale(spikeScale)
+    const spikesScaleReal = 1.09 + (bubbleScaleReal - 1) * 0.6
+    const spikesScale = Math.round(spikesScaleReal * 20) / 20
+    sSpikesCur.setBasedScale(spikesScale)
+    sSpikesCur.translation.y = H / 2 +
+      (sSpikesCur.basedH * (1 - spikesScale)) * (spikesAnchor - 0.5)
+
+    const spikesFixed2Scale = Math.round((1 + (spikesScaleReal - 1) * 0.3) * 45) / 45
+    sSpikesFixed2.setBasedScale(-1.1 * spikesFixed2Scale, 1.1 * spikesFixed2Scale)
+    sSpikesFixed2.opacity = Math.round(Math.max(0, 1.1 - bubbleScale) * 5 / 0.25) * 0.25 * 0.15
+    sSpikesFixed2.translation.y = H / 2 +
+      (sSpikesFixed2.basedH * (1 - spikesFixed2Scale)) * (spikesAnchor - 0.5)
   }
 
   return {
