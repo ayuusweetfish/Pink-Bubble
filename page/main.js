@@ -4,7 +4,7 @@ import sceneMain from './scene-main.js'
 
 const twoElement = document.getElementById('draw')
 const two = new Two({
-  type: Two.Types.svg,
+  type: Two.Types.canvas,
   fullscreen: true,
 }).appendTo(twoElement)
 
