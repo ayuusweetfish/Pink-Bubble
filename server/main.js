@@ -6,6 +6,17 @@ const port = +Deno.env.get('PORT') || 23123
 const server = Deno.listen({ port })
 log(`Running at http://localhost:${port}/`)
 
+let interactionStatus = 'N'
+/*
+Statuses:
+N - idle (white screen)
+I - intro sequence
+E<energy> - main scene with countdown
+
+Messages:
+L<comma-separated IDs> - updated list of connected terminals
+S<status> - updated status
+*/
 const kioskSockets = new Set()
 const terminalSockets = new Set()
 const unicastCount = (s) => {
@@ -13,22 +24,43 @@ const unicastCount = (s) => {
   for (const s of terminalSockets) ids.push(s.uuid)
   s.send('L' + ids.join(','))
 }
-const broadcastCount = () => { for (const s of kioskSockets) unicastCount(s) }
+const unicastStatus = (s) => {
+  s.send('S' + interactionStatus)
+}
+const broadcastKiosk = (unicastFn) => { for (const s of kioskSockets) unicastFn(s) }
+const broadcastAll = (unicastFn) => {
+  for (const s of kioskSockets) unicastFn(s)
+  for (const s of terminalSockets) unicastFn(s)
+}
+
+const restart = () => {
+  interactionStatus = 'E100'
+  const timer = setInterval(() => {
+    let curBaseEnr = +interactionStatus.substring(1)
+    curBaseEnr -= 2
+    if (curBaseEnr <= 0) {
+    }
+    interactionStatus = 'E' + curBaseEnr.toString()
+    broadcastAll(unicastStatus)
+  }, 1000)
+}
+restart()
 
 const serveReq = (req) => {
   const url = new URL(req.url)
   if (req.headers.get('Upgrade') === 'websocket') {
     const { socket, response } = Deno.upgradeWebSocket(req)
     const isKiosk = (url.pathname === '/kiosk/')
-    socket.uuid = url.search.substring(1)
+    socket.uuid = url.search.substring(1).replaceAll(',', '-')
     socket.onopen = () => {
       log(`Connected ${url.pathname} ${socket.uuid}`)
       if (isKiosk) {
         kioskSockets.add(socket)
         unicastCount(socket)
+        unicastStatus(socket)
       } else {
         terminalSockets.add(socket)
-        broadcastCount()
+        broadcastKiosk(unicastCount)
       }
     }
     socket.onclose = (e) => {
@@ -37,7 +69,7 @@ const serveReq = (req) => {
         kioskSockets.delete(socket)
       } else {
         terminalSockets.delete(socket)
-        broadcastCount()
+        broadcast(unicastCount)
       }
     }
     return response

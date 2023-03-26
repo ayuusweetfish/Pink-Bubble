@@ -27,6 +27,11 @@ export default () => {
   for (const s of sSpikes) s.opacity = 0.8
   const sBubble = ['bubble-1', 'bubble-2', 'bubble-3'].map(spriteHere)
 
+  let terminalsList = []
+  let curBubbleSize = 0
+  let targetBaseEnr = 1
+  let curBaseEnr = 1
+
   let T = 0
   let tGirl = 0
   let sGirlIndex = 0
@@ -45,9 +50,15 @@ export default () => {
     for (let i = 0; i < sBubble.length; i++) sBubble[i].visible = (i === sBubbleIndex)
 
     T = (T + 1) % 1800
+    //const x = Math.cos(T / 1800 * Math.PI * 2)
+    //const bubbleScaleReal = 1 - 0.2 * Math.pow(Math.abs(x), 0.85) * Math.sign(x)
+    curBubbleSize += (terminalsList.length - curBubbleSize) * (1/160)
+    curBaseEnr += (targetBaseEnr - curBaseEnr) * (1/160)
+
     const sBubbleCur = sBubble[sBubbleIndex]
-    const x = Math.cos(T / 1800 * Math.PI * 2)
-    const bubbleScaleReal = 1 - 0.2 * Math.pow(Math.abs(x), 0.85) * Math.sign(x)
+    const bubbleScaleReal =
+      (0.8 + curBaseEnr * 0.2) +
+      0.4 * (1 - Math.exp(-(curBubbleSize + curBaseEnr * 2) * 0.33))
     const bubbleScale = Math.round(bubbleScaleReal * 30) / 30
     sBubbleCur.setBasedScale(bubbleScale)
     sBubbleCur.translation.y = H / 2 +
@@ -83,6 +94,17 @@ export default () => {
     socket.onmessage = (e) => {
       const text = e.data
       console.log(text)
+      const payload = text.substring(1)
+      switch (text[0]) {
+      case 'L':
+        terminalsList = (payload ? payload.split(',') : [])
+        break
+      case 'S':
+        if (payload[0] === 'E') {
+          targetBaseEnr = +payload.substring(1) / 100
+        }
+        break
+      }
     }
   }
   reconnect()
