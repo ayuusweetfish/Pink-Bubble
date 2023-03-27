@@ -1,7 +1,7 @@
 import { createSprite, socketMsgHandlerReg } from './utils.js'
 import { getDirector } from './director.js'
 
-export default () => {
+export default (two) => {
   const [W, H] = getDirector().dims
   const group = new Two.Group()
 
@@ -12,6 +12,16 @@ export default () => {
     s.translation.y = H / 2
     return s
   }
+
+  const svgRoot = document.createElement('svg')
+  // svgRoot.style.display = 'none'
+  const createRoughSpot = () => {
+    svgRoot.replaceChildren()
+    const roughSvg = rough.svg(svgRoot)
+    svgRoot.appendChild(roughSvg.circle(200, 200, 100, { fill: '#888', fillStyle: 'zigzag' }))
+    return two.interpret(svgRoot)
+  }
+  group.add(createRoughSpot())
 
   const bubbleAnchor = 0.82
   const spikesAnchor = 0.56

@@ -14,7 +14,7 @@ const H = two.height
 const _fn = () => {
 
 const director = getDirector(two)
-director.pushScene(sceneMain())
+director.pushScene(sceneMain(two))
 
 const FRAME_INTERVAL = 1000.0 / 240
 let globalTime = FRAME_INTERVAL / 2
