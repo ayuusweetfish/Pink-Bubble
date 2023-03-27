@@ -7,6 +7,8 @@ const server = Deno.listen({ port })
 log(`Running at http://localhost:${port}/`)
 log(`Kiosk: http://localhost:${port}/kiosk/`)
 
+const isDenoDeploy = (Deno.env.get('DENO_DEPLOYMENT_ID') !== undefined)
+
 let interactionStatus = 'N'
 /*
 Statuses:
@@ -105,8 +107,8 @@ const serveReq = (req) => {
       headers: { 'Location': '/kiosk/' },
     })
   if (url.pathname.startsWith('/kiosk/'))
-    return serveDir(req, { fsRoot: '../kiosk', urlRoot: 'kiosk' })
-  return serveDir(req, { fsRoot: '../terminal', urlRoot: undefined })
+    return serveDir(req, { fsRoot: (isDenoDeploy ? '/src' : '..') + '/kiosk', urlRoot: 'kiosk' })
+  return serveDir(req, { fsRoot: (isDenoDeploy ? '/src' : '..') + '/terminal', urlRoot: undefined })
 }
 
 const handleConn = async (conn) => {
