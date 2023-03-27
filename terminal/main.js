@@ -109,6 +109,7 @@ const reconnect = () => {
         ))
       } else if (text[1] === 'N') {
         moreRetries = false
+        currentSizeGroup = undefined
       } else {
         currentSizeGroup = undefined
       }

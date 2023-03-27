@@ -40,7 +40,7 @@ const broadcastAll = (msg) => {
 
 let baseEnr
 const restart = () => {
-  baseEnr = 100
+  baseEnr = 102
   const drain = () => {
     baseEnr -= 2
     const totalEnr = baseEnr + Math.round(Math.sqrt(terminalSockets.size) * 20)
@@ -52,6 +52,7 @@ const restart = () => {
     }
     broadcastAll(statusMessage())
   }
+  drain()
   const timer = setInterval(drain, 1000)
 }
 
