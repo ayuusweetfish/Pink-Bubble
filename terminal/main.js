@@ -88,6 +88,7 @@ setInterval(() => {
 }, 525)
 
 let socket
+let moreRetries = true
 const reconnect = () => {
   socket = new WebSocket(
     (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
@@ -96,7 +97,7 @@ const reconnect = () => {
   socket.onopen = () => {}
   socket.onclose = () => {
     socket = undefined
-    setTimeout(() => reconnect(), 1000)
+    if (moreRetries) setTimeout(() => reconnect(), 1000)
   }
   socket.onmessage = (e) => {
     const text = e.data
@@ -106,6 +107,8 @@ const reconnect = () => {
         currentSizeGroup = Math.max(0, Math.min(SPOT_N_SIZEGROUPS - 1,
           Math.round((+text.substring(2) / 100) * (SPOT_N_SIZEGROUPS - 1))
         ))
+      } else if (text[1] === 'N') {
+        moreRetries = false
       } else {
         currentSizeGroup = undefined
       }
