@@ -44,6 +44,7 @@ export default (two) => {
 
   const bubbleAnchor = 0.82
   const spikesAnchor = 0.56
+  const spotsAnchor = 0.75
 
   const sGirl = ['girl-1', 'girl-2', 'girl-3'].map(spriteHere)
   const sSpikesFixed1 = spriteHere('spikes-1')
@@ -68,8 +69,9 @@ export default (two) => {
       return
     }
     const spots = []
-    const angle = (cyrb53(id, 327) / 0x7fffffff) * Math.PI
-    const dist = ((cyrb53(id, 328) / 0x7fffffff) * 0.5 + 0.5)
+    const angle = ((cyrb53(id, 327) / 0x7fffffff) * 0.8 + 0.1) * Math.PI
+    const distMin = 1 - 0.48 * Math.abs(angle / Math.PI - 0.5) / 0.4
+    const dist = (cyrb53(id, 328) / 0x7fffffff) * (1 - distMin) + distMin
     for (let i = 0; i < SPOT_N_SIZEGROUPS; i++) {
       spots[i] = []
       for (let j = 0; j < SPOT_N_FRAMES; j++) {
@@ -163,14 +165,13 @@ export default (two) => {
       const sizeGroupIndex = Math.floor(0.5 + (SPOT_N_SIZEGROUPS - 1) * Math.max(0, Math.min(1,
         (record.timer / 240) * ((bubbleScaleReal - BUBBLE_SCALE_MIN) / BUBBLE_SCALE_INC)
       )))
-      console.log(sizeGroupIndex, record.timer, bubbleScaleReal)
       for (let i = 0; i < SPOT_N_SIZEGROUPS; i++)
         for (let j = 0; j < SPOT_N_FRAMES; j++)
           spots[i][j].visible = (i === sizeGroupIndex && j === frameIndex)
       spots[sizeGroupIndex][frameIndex].translation.x =
-        W / 2 + record.offsetX * (sBubbleCur.basedH * bubbleScale * 0.3)
+        record.offsetX * (sBubbleCur.basedH * bubbleScale * 0.6) + W / 2
       spots[sizeGroupIndex][frameIndex].translation.y =
-        H / 2 + record.offsetY * (sBubbleCur.basedH * bubbleScale * 0.3)
+        record.offsetY * (sBubbleCur.basedH * bubbleScale * 0.6) + H * spotsAnchor
     }
   }
 
