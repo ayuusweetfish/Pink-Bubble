@@ -91,6 +91,7 @@ export const socketMsgSend = (msg) => {
   socketTrySendAll()
 }
 
+const connectionHintEl = document.getElementById('connection-hint')
 const reconnect = () => {
   if (socket) return
   socket = new WebSocket(
@@ -98,10 +99,12 @@ const reconnect = () => {
     window.location.host + window.location.pathname)
   socket.onopen = () => {
     socketTrySendAll()
+    connectionHintEl.style.display = 'none'
   }
   socket.onclose = () => {
     socket = undefined
     setTimeout(() => reconnect(), 1000)
+    connectionHintEl.style.display = 'block'
   }
   socket.onmessage = (e) => {
     const text = e.data
