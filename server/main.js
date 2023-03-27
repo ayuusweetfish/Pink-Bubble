@@ -26,10 +26,12 @@ const terminalsListMessage = () => {
   return 'L' + ids.join(',')
 }
 const statusMessage = () => 'S' + interactionStatus
-const broadcastKiosk = (msg) => { for (const s of kioskSockets) s.send(msg) }
+const broadcastKiosk = (msg) => {
+  for (const s of kioskSockets) if (s.readyState === 1) s.send(msg)
+}
 const broadcastAll = (msg) => {
-  for (const s of kioskSockets) s.send(msg)
-  for (const s of terminalSockets) s.send(msg)
+  for (const s of kioskSockets) if (s.readyState === 1) s.send(msg)
+  for (const s of terminalSockets) if (s.readyState === 1) s.send(msg)
 }
 
 const restart = () => {
