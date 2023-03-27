@@ -5,6 +5,7 @@ const log = (msg) => console.log(`${(new Date()).toISOString()} ${msg}`)
 const port = +Deno.env.get('PORT') || 23123
 const server = Deno.listen({ port })
 log(`Running at http://localhost:${port}/`)
+log(`Kiosk: http://localhost:${port}/kiosk/`)
 
 let interactionStatus = 'N'
 /*

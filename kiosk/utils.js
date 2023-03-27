@@ -53,3 +53,34 @@ export const createSprite = function (name, w, h, ax, ay) {
 
   return sprite
 }
+
+let socket
+const socketMsgBuffer = []
+let socketMsgFn
+
+const socketMsgFnCall = () => {
+  if (socketMsgFn)
+    for (const msg of socketMsgBuffer.splice(0)) socketMsgFn(msg)
+}
+export const socketMsgHandlerReg = (fn) => {
+  socketMsgFn = fn
+  socketMsgFnCall()
+}
+
+const reconnect = () => {
+  if (socket) return
+  socket = new WebSocket(
+    (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
+    window.location.host + window.location.pathname)
+  socket.onopen = () => {}
+  socket.onclose = () => {
+    socket = undefined
+    setTimeout(() => reconnect(), 1000)
+  }
+  socket.onmessage = (e) => {
+    const text = e.data
+    socketMsgBuffer.push(text)
+    socketMsgFnCall()
+  }
+}
+export const socketStartConnection = reconnect

@@ -1,4 +1,4 @@
-import { createSprite } from './utils.js'
+import { createSprite, socketMsgHandlerReg } from './utils.js'
 import { getDirector } from './director.js'
 
 export default () => {
@@ -81,33 +81,19 @@ export default () => {
       (sSpikesFixed2.basedH * (1 - spikesFixed2Scale)) * (spikesAnchor - 0.5)
   }
 
-  let socket
-  const reconnect = () => {
-    socket = new WebSocket(
-      (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
-      window.location.host + window.location.pathname)
-    socket.onopen = () => {}
-    socket.onclose = () => {
-      socket = undefined
-      setTimeout(() => reconnect(), 1000)
-    }
-    socket.onmessage = (e) => {
-      const text = e.data
-      console.log(text)
-      const payload = text.substring(1)
-      switch (text[0]) {
-      case 'L':
-        terminalsList = (payload ? payload.split(',') : [])
-        break
-      case 'S':
-        if (payload[0] === 'E') {
-          targetBaseEnr = +payload.substring(1) / 100
-        }
-        break
+  socketMsgHandlerReg((text) => {
+    const payload = text.substring(1)
+    switch (text[0]) {
+    case 'L':
+      terminalsList = (payload ? payload.split(',') : [])
+      break
+    case 'S':
+      if (payload[0] === 'E') {
+        targetBaseEnr = +payload.substring(1) / 100
       }
+      break
     }
-  }
-  reconnect()
+  })
 
   return {
     update,

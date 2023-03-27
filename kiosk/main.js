@@ -1,4 +1,4 @@
-import { loadImages } from './utils.js'
+import { loadImages, socketStartConnection } from './utils.js'
 import { getDirector } from './director.js'
 import sceneMain from './scene-main.js'
 
@@ -85,3 +85,4 @@ loadImages([
     _fn()
   }
 })
+socketStartConnection()
