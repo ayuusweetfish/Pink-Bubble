@@ -17,6 +17,36 @@ const cyrb53 = (str, seed = 0) => {
   return (h1 ^ h2) & 0x7fffffff
 }
 
+const roughSpotSvg = (uuid, size, frameIndex) => {
+  const svgRoot = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  let seed = cyrb53(uuid, 221)
+  const randNext = () => {
+    seed = Math.imul(seed, 1103515245, 12345)
+    return seed & 0x7fffffff
+  }
+  let r, g, b
+  while (true) {
+    r = randNext() % 127 + 128
+    g = randNext() % 127 + 128
+    b = randNext() % 127 + 128
+    if (
+      Math.max(r, g, b) - Math.min(r, g, b) >= 20 &&
+      (r + g) / 2 >= b * 0.8 &&
+      Math.pow(r / 255, 1/2.2) * 0.2126 + Math.pow(g / 255, 1/2.2) * 0.7152 + Math.pow(b / 255, 1/2.2) * 0.0722 >= 0.7 &&
+      Math.pow(r / 255, 1/2.2) * 0.2126 + Math.pow(g / 255, 1/2.2) * 0.7152 + Math.pow(b / 255, 1/2.2) * 0.0722 <= 0.8
+    )
+      break
+  }
+  svgRoot.replaceChildren()
+  const roughSvg = rough.svg(svgRoot)
+  svgRoot.appendChild(roughSvg.circle(0, 0, size, {
+    fill: `#${[r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('')}`,
+    fillStyle: 'zigzag',
+    seed: cyrb53(uuid, frameIndex) + 1,
+  }))
+  return svgRoot
+}
+
 export default (two) => {
   const [W, H] = getDirector().dims
   const group = new Two.Group()
@@ -29,17 +59,8 @@ export default (two) => {
     return s
   }
 
-  const svgRoot = document.createElement('svg')
-  // svgRoot.style.display = 'none'
-  const createRoughSpot = (uuid, size, frameIndex) => {
-    svgRoot.replaceChildren()
-    const roughSvg = rough.svg(svgRoot)
-    svgRoot.appendChild(roughSvg.circle(0, 0, size, {
-      fill: '#888',
-      fillStyle: 'zigzag',
-      seed: cyrb53(uuid, frameIndex) + 1,
-    }))
-    return two.interpret(svgRoot)
+  const roughSpotHere = (uuid, size, frameIndex) => {
+    return two.interpret(roughSpotSvg(uuid, size, frameIndex))
   }
 
   const bubbleAnchor = 0.82
@@ -75,7 +96,7 @@ export default (two) => {
     for (let i = 0; i < SPOT_N_SIZEGROUPS; i++) {
       spots[i] = []
       for (let j = 0; j < SPOT_N_FRAMES; j++) {
-        spots[i][j] = createRoughSpot(id,
+        spots[i][j] = roughSpotHere(id,
           sBubble[0].basedH * 0.15 *
           Math.pow((i + 1) / SPOT_N_SIZEGROUPS, 0.85), j)
         spotsContainer.add(spots[i][j])
