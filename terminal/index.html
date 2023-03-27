@@ -18,7 +18,7 @@ const reconnect = () => {
     setTimeout(() => reconnect(), 1000)
   }
   socket.onmessage = (e) => {
-    const text = JSON.parse(e.data)
+    const text = e.data
     console.log(text)
   }
 }

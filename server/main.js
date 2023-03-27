@@ -20,18 +20,16 @@ S<status> - updated status
 */
 const kioskSockets = new Set()
 const terminalSockets = new Set()
-const unicastCount = (s) => {
+const terminalsListMessage = () => {
   const ids = []
   for (const s of terminalSockets) ids.push(s.uuid)
-  s.send('L' + ids.join(','))
+  return 'L' + ids.join(',')
 }
-const unicastStatus = (s) => {
-  s.send('S' + interactionStatus)
-}
-const broadcastKiosk = (unicastFn) => { for (const s of kioskSockets) unicastFn(s) }
-const broadcastAll = (unicastFn) => {
-  for (const s of kioskSockets) unicastFn(s)
-  for (const s of terminalSockets) unicastFn(s)
+const statusMessage = () => 'S' + interactionStatus
+const broadcastKiosk = (msg) => { for (const s of kioskSockets) s.send(msg) }
+const broadcastAll = (msg) => {
+  for (const s of kioskSockets) s.send(msg)
+  for (const s of terminalSockets) s.send(msg)
 }
 
 const restart = () => {
@@ -42,8 +40,9 @@ const restart = () => {
     if (curBaseEnr <= 0) {
     }
     interactionStatus = 'E' + curBaseEnr.toString()
-    broadcastAll(unicastStatus)
-  }, 1000)
+    console.log(interactionStatus)
+    broadcastAll(statusMessage())
+  }, 100)
 }
 restart()
 
@@ -57,11 +56,11 @@ const serveReq = (req) => {
       log(`Connected ${url.pathname} ${socket.uuid}`)
       if (isKiosk) {
         kioskSockets.add(socket)
-        unicastCount(socket)
-        unicastStatus(socket)
+        socket.send(statusMessage())
+        socket.send(terminalsListMessage())
       } else {
         terminalSockets.add(socket)
-        broadcastKiosk(unicastCount)
+        broadcastKiosk(terminalsListMessage())
       }
     }
     socket.onclose = (e) => {
@@ -70,7 +69,7 @@ const serveReq = (req) => {
         kioskSockets.delete(socket)
       } else {
         terminalSockets.delete(socket)
-        broadcastKiosk(unicastCount)
+        broadcastKiosk(terminalsListMessage())
       }
     }
     return response
