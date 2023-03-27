@@ -103,7 +103,6 @@ const reconnect = () => {
   }
   socket.onmessage = (e) => {
     const text = e.data
-    console.log(text)
     if (text[0] === 'S') {
       if (text[1] === 'E') {
         currentSizeGroup = Math.max(0, Math.min(SPOT_N_SIZEGROUPS - 1,

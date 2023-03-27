@@ -188,7 +188,7 @@ export default () => {
         record.timer += record.timerDir
         if (record.timerDir === +1 && record.timer === 240)
           record.timerDir = 0
-        if (record.timerDir === -1 && record.timer === 0) {
+        if (record.timerDir === -1 && record.timer <= 0) {
           for (const sizeGroup of spots)
             for (const spot of sizeGroup) spot.remove()
           delete terminals[uuid]
@@ -205,7 +205,8 @@ export default () => {
       spots[sizeGroupIndex][frameIndex].translation.x =
         record.offsetX * (sBubbleCur.basedH * bubbleScale * 0.6) + W / 2
       spots[sizeGroupIndex][frameIndex].translation.y =
-        record.offsetY * (sBubbleCur.basedH * bubbleScale * 0.6) + H * spotsAnchor
+        record.offsetY * (sBubbleCur.basedH * bubbleScale * 0.6) + H / 2
+          + sBubbleCur.basedH * (spotsAnchor - 0.5)
     }
 
     if (!handlerRegistered) {

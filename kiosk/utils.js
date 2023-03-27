@@ -105,6 +105,7 @@ const reconnect = () => {
   }
   socket.onmessage = (e) => {
     const text = e.data
+    console.log(text)
     socketMsgBuffer.push(text)
     socketMsgFnCall()
   }
