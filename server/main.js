@@ -69,7 +69,7 @@ const serveReq = (req) => {
         kioskSockets.delete(socket)
       } else {
         terminalSockets.delete(socket)
-        broadcast(unicastCount)
+        broadcastKiosk(unicastCount)
       }
     }
     return response
