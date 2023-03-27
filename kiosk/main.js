@@ -67,6 +67,7 @@ two.bind('update', update).play()
 
 const loadingElement = document.getElementById('loading')
 loadImages([
+  'qr',
   'intro-1',
   'intro-2',
   'intro-3',
