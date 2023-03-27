@@ -68,14 +68,16 @@ export default (two) => {
   const spotsAnchor = 0.75
 
   const sGirl = ['girl-1', 'girl-2', 'girl-3'].map(spriteHere)
-  const sSpikesFixed1 = spriteHere('spikes-1')
+  const sSpikesFixed1 = spriteHere('spikes-1-1')
   sSpikesFixed1.opacity = 0.05
   sSpikesFixed1.setBasedScale(1.2)
   sSpikesFixed1.translation.y = H / 2 +
     (sSpikesFixed1.basedH * (1 - 1.2)) * (spikesAnchor - 0.5)
-  const sSpikesFixed2 = spriteHere('spikes-2')
-  const sSpikes = ['spikes-1', 'spikes-2', 'spikes-3'].map(spriteHere)
-  for (const s of sSpikes) s.opacity = 0.8
+  const sSpikesFixed2 = spriteHere('spikes-2-1')
+  const sSpikes = ['spikes-1-', 'spikes-2-', 'spikes-3-'].map((s) => (
+    [1, 2, 3].map((n) => spriteHere(s + n))
+  ))
+  for (const sSeq of sSpikes) for (const s of sSeq) s.opacity = 0.8
   const sBubble = ['bubble-1', 'bubble-2', 'bubble-3'].map(spriteHere)
 
   const terminals = {}
@@ -124,6 +126,8 @@ export default (two) => {
   let sGirlIndex = 0
   let tBubble = 0
   let sBubbleIndex = 0
+  let tSpikes = 0
+  let sSpikesFrameIndex = 0
   let spotCycleTimer = 0
   const update = function () {
     if (++tGirl >= 160) {
@@ -151,10 +155,16 @@ export default (two) => {
     sBubbleCur.translation.y = H / 2 +
       (sBubbleCur.basedH * (1 - bubbleScale)) * (bubbleAnchor - 0.5)
 
-    const sSpikesIndex =
+    if (++tSpikes >= 150) {
+      sSpikesFrameIndex = (sSpikesFrameIndex + 1) % 3
+      tSpikes -= 150
+    }
+    const sSpikesSizeIndex =
       (Math.max(0, Math.min(2, Math.round((1.04 - bubbleScaleReal) / 0.12))))
-    for (let i = 0; i < 3; i++) sSpikes[i].visible = (i === sSpikesIndex)
-    const sSpikesCur = sSpikes[sSpikesIndex]
+    for (let i = 0; i < 3; i++)
+      for (let j = 0; j < 3; j++)
+        sSpikes[i][j].visible = (i === sSpikesSizeIndex && j === sSpikesFrameIndex)
+    const sSpikesCur = sSpikes[sSpikesSizeIndex][sSpikesFrameIndex]
     const spikesScaleReal = 1.09 + (bubbleScaleReal - 1) * 0.6
     const spikesScale = Math.round(spikesScaleReal * 20) / 20
     sSpikesCur.setBasedScale(spikesScale)
