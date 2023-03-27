@@ -74,7 +74,12 @@ const serveReq = (req) => {
     }
     return response
   }
-  if (url.pathname.startsWith('/kiosk'))
+  if (url.pathname === '/kiosk')
+    return new Response('Redirecting to /kiosk/', {
+      status: 302,
+      headers: { 'Location': '/kiosk/' },
+    })
+  if (url.pathname.startsWith('/kiosk/'))
     return serveDir(req, { fsRoot: '../kiosk', urlRoot: 'kiosk' })
   return serveDir(req, { fsRoot: '../terminal', urlRoot: undefined })
 }
