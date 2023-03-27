@@ -64,7 +64,7 @@ export default (two) => {
   const SPOT_FRAMELEN = 120
   const addTerminal = (id) => {
     if (terminals[id]) {
-      terminals[id].timerDir = +1
+      if (terminals[id].timer < 240) terminals[id].timerDir = +1
       return
     }
     const spots = []
@@ -91,7 +91,6 @@ export default (two) => {
     terminals[id].timerDir = -1
   }
 
-  let curBubbleSize = 0
   let targetBaseEnr = 1
   let curBaseEnr = 1
   const BUBBLE_SCALE_MIN = 0.8
@@ -118,13 +117,12 @@ export default (two) => {
     T = (T + 1) % 1800
     //const x = Math.cos(T / 1800 * Math.PI * 2)
     //const bubbleScaleReal = 1 - 0.2 * Math.pow(Math.abs(x), 0.85) * Math.sign(x)
-    curBubbleSize += (Object.keys(terminals).length - curBubbleSize) * (1/160)
     curBaseEnr += (targetBaseEnr - curBaseEnr) * (1/160)
 
     const sBubbleCur = sBubble[sBubbleIndex]
     const bubbleScaleReal =
       BUBBLE_SCALE_MIN +
-      BUBBLE_SCALE_INC * (1 - Math.exp(-(curBubbleSize + curBaseEnr * 2) * 0.33))
+      BUBBLE_SCALE_INC * (1 - Math.exp(-curBaseEnr * 1.5))
     const bubbleScale = Math.round(bubbleScaleReal * 30) / 30
     sBubbleCur.setBasedScale(bubbleScale)
     sBubbleCur.translation.y = H / 2 +
@@ -165,6 +163,7 @@ export default (two) => {
       const sizeGroupIndex = Math.floor(0.5 + (SPOT_N_SIZEGROUPS - 1) * Math.max(0, Math.min(1,
         (record.timer / 240) * ((bubbleScaleReal - BUBBLE_SCALE_MIN) / BUBBLE_SCALE_INC)
       )))
+      console.log(sizeGroupIndex, record.timer, bubbleScaleReal)
       for (let i = 0; i < SPOT_N_SIZEGROUPS; i++)
         for (let j = 0; j < SPOT_N_FRAMES; j++)
           spots[i][j].visible = (i === sizeGroupIndex && j === frameIndex)

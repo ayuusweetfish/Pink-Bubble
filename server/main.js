@@ -34,17 +34,20 @@ const broadcastAll = (msg) => {
   for (const s of terminalSockets) if (s.readyState === 1) s.send(msg)
 }
 
+let baseEnr
 const restart = () => {
-  interactionStatus = 'E100'
-  const timer = setInterval(() => {
-    let curBaseEnr = +interactionStatus.substring(1)
-    curBaseEnr -= 2
-    if (curBaseEnr <= 0) {
-    }
-    interactionStatus = 'E' + curBaseEnr.toString()
+  baseEnr = 102
+  const drain = () => {
+    baseEnr -= 2
+    const totalEnr = baseEnr + Math.round(Math.sqrt(terminalSockets.size) * 20)
+    if (totalEnr <= 0)
+      interactionStatus = 'N'
+    else
+      interactionStatus = 'E' + totalEnr.toString()
     console.log(interactionStatus)
     broadcastAll(statusMessage())
-  }, 100)
+  }
+  const timer = setInterval(drain, 1000)
 }
 restart()
 
