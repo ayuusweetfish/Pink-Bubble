@@ -1,4 +1,6 @@
-const uuid = crypto.randomUUID()
+const uuid = (typeof crypto.randomUUID === 'function' ?
+  crypto.randomUUID() :
+  Math.random().toString().substring(2) + Math.random().toString().substring(2))
 
 // Random light spot
 const cyrb53 = (str, seed = 0) => {
@@ -37,7 +39,7 @@ const roughSpotSvg = (uuid, size, frameIndex) => {
     )
       break
   }
-  svgRoot.replaceChildren()
+  while (svgRoot.lastChild) svgRoot.remove(svgRoot.lastChild)
   const roughSvg = rough.svg(svgRoot)
   svgRoot.appendChild(roughSvg.circle(0, 0, size, {
     fill: `#${[r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('')}`,
