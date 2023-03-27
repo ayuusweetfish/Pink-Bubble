@@ -59,12 +59,36 @@ const socketMsgBuffer = []
 let socketMsgFn
 
 const socketMsgFnCall = () => {
-  if (socketMsgFn)
-    for (const msg of socketMsgBuffer.splice(0)) socketMsgFn(msg)
+  if (socketMsgFn) {
+    const fn = socketMsgFn  // Prevent change mid-way
+    let stopped = false
+    for (const msg of socketMsgBuffer.splice(0)) {
+      const putBack = (stopped ? msg : fn(msg))
+      if (putBack) {
+        if (putBack instanceof Array && putBack[1]) {
+          if (putBack[0]) socketMsgBuffer.push(putBack[0])
+          stopped = true
+        } else {
+          socketMsgBuffer.push(putBack)
+        }
+      }
+    }
+  }
 }
 export const socketMsgHandlerReg = (fn) => {
   socketMsgFn = fn
   socketMsgFnCall()
+}
+
+const socketOutboundMsgBuffer = []
+const socketTrySendAll = () => {
+  if (!socket) return
+  for (const msg of socketOutboundMsgBuffer.splice(0))
+    socket.send(msg)
+}
+export const socketMsgSend = (msg) => {
+  socketOutboundMsgBuffer.push(msg)
+  socketTrySendAll()
 }
 
 const reconnect = () => {
@@ -72,7 +96,9 @@ const reconnect = () => {
   socket = new WebSocket(
     (window.location.protocol === 'https:' ? 'wss://' : 'ws://') +
     window.location.host + window.location.pathname)
-  socket.onopen = () => {}
+  socket.onopen = () => {
+    socketTrySendAll()
+  }
   socket.onclose = () => {
     socket = undefined
     setTimeout(() => reconnect(), 1000)

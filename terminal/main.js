@@ -106,6 +106,8 @@ const reconnect = () => {
         currentSizeGroup = Math.max(0, Math.min(SPOT_N_SIZEGROUPS - 1,
           Math.round((+text.substring(2) / 100) * (SPOT_N_SIZEGROUPS - 1))
         ))
+      } else {
+        currentSizeGroup = undefined
       }
     }
   }

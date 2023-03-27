@@ -38,6 +38,12 @@ export const getDirector = function (two) {
     window.history.back()
   }
 
+  const replaceScene = function (scene) {
+    two.remove(scenes[scenes.length - 1].group)
+    scenes[scenes.length - 1] = scene
+    two.add(scene.group)
+  }
+
   const getScene = function () {
     return scenes[curLevel]
   }
@@ -102,10 +108,12 @@ export const getDirector = function (two) {
   }
 
   return directorInstance = {
+    two,
     dims,
     transitions,
     pushScene,
     popScene,
+    replaceScene,
     getScene,
     update,
     ptHold,

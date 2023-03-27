@@ -1,6 +1,6 @@
 import { loadImages, socketStartConnection } from './utils.js'
 import { getDirector } from './director.js'
-import sceneMain from './scene-main.js'
+import sceneIdle from './scene-idle.js'
 
 const twoElement = document.getElementById('draw')
 const two = new Two({
@@ -14,7 +14,7 @@ const H = two.height
 const _fn = () => {
 
 const director = getDirector(two)
-director.pushScene(sceneMain(two))
+director.pushScene(sceneIdle())
 
 const FRAME_INTERVAL = 1000.0 / 240
 let globalTime = FRAME_INTERVAL / 2
@@ -67,6 +67,10 @@ two.bind('update', update).play()
 
 const loadingElement = document.getElementById('loading')
 loadImages([
+  'intro-1',
+  'intro-2',
+  'intro-3',
+  'intro-4',
   'girl-1',
   'girl-2',
   'girl-3',

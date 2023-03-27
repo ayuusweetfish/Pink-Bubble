@@ -25,7 +25,11 @@ const terminalsListMessage = () => {
   for (const s of terminalSockets) ids.push(s.uuid)
   return 'L' + ids.join(',')
 }
-const statusMessage = () => 'S' + interactionStatus
+// const statusMessage = () => 'S' + interactionStatus
+const statusMessage = () => {
+  console.log('Status: ' + interactionStatus)
+  return 'S' + interactionStatus
+}
 const broadcastKiosk = (msg) => {
   for (const s of kioskSockets) if (s.readyState === 1) s.send(msg)
 }
@@ -36,20 +40,20 @@ const broadcastAll = (msg) => {
 
 let baseEnr
 const restart = () => {
-  baseEnr = 102
+  baseEnr = 100
   const drain = () => {
     baseEnr -= 2
     const totalEnr = baseEnr + Math.round(Math.sqrt(terminalSockets.size) * 20)
-    if (totalEnr <= 0)
+    if (totalEnr <= 0) {
       interactionStatus = 'N'
-    else
+      clearInterval(timer)
+    } else {
       interactionStatus = 'E' + totalEnr.toString()
-    console.log(interactionStatus)
+    }
     broadcastAll(statusMessage())
   }
   const timer = setInterval(drain, 1000)
 }
-restart()
 
 const serveReq = (req) => {
   const url = new URL(req.url)
@@ -62,9 +66,23 @@ const serveReq = (req) => {
       if (isKiosk) {
         kioskSockets.add(socket)
         socket.send(statusMessage())
-        socket.send(terminalsListMessage())
+        if (interactionStatus.startsWith('E'))
+          socket.send(terminalsListMessage())
       } else {
         terminalSockets.add(socket)
+        if (interactionStatus === 'N') {
+          interactionStatus = 'I'
+          broadcastAll(statusMessage())
+        } else if (interactionStatus.startsWith('E')) {
+          broadcastKiosk(terminalsListMessage())
+        }
+      }
+    }
+    socket.onmessage = (e) => {
+      const text = e.data
+      if (isKiosk && text === 'F') {
+        restart()
+        broadcastAll(statusMessage())
         broadcastKiosk(terminalsListMessage())
       }
     }
@@ -74,7 +92,8 @@ const serveReq = (req) => {
         kioskSockets.delete(socket)
       } else {
         terminalSockets.delete(socket)
-        broadcastKiosk(terminalsListMessage())
+        if (interactionStatus.startsWith('E'))
+          broadcastKiosk(terminalsListMessage())
       }
     }
     return response

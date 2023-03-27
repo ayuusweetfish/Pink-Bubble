@@ -1,5 +1,7 @@
 import { createSprite, socketMsgHandlerReg } from './utils.js'
 import { getDirector } from './director.js'
+import sceneIdle from './scene-idle.js'
+import sceneIntro from './scene-intro.js'
 
 const cyrb53 = (str, seed = 0) => {
   let h1 = 20230123 ^ seed,
@@ -47,7 +49,7 @@ const roughSpotSvg = (uuid, size, frameIndex) => {
   return svgRoot
 }
 
-export default (two) => {
+export default () => {
   const [W, H] = getDirector().dims
   const group = new Two.Group()
 
@@ -60,7 +62,7 @@ export default (two) => {
   }
 
   const roughSpotHere = (uuid, size, frameIndex) => {
-    return two.interpret(roughSpotSvg(uuid, size, frameIndex))
+    return getDirector().two.interpret(roughSpotSvg(uuid, size, frameIndex))
   }
 
   const bubbleAnchor = 0.82
@@ -121,6 +123,7 @@ export default (two) => {
   const BUBBLE_SCALE_MIN = 0.8
   const BUBBLE_SCALE_INC = 0.4
 
+  let handlerRegistered = false
   let T = 0
   let tGirl = 0
   let sGirlIndex = 0
@@ -204,25 +207,38 @@ export default (two) => {
       spots[sizeGroupIndex][frameIndex].translation.y =
         record.offsetY * (sBubbleCur.basedH * bubbleScale * 0.6) + H * spotsAnchor
     }
-  }
 
-  socketMsgHandlerReg((text) => {
-    const payload = text.substring(1)
-    switch (text[0]) {
-    case 'L': {
-      const terminalsSet = new Set(payload ? payload.split(',') : [])
-      for (const id in terminals)
-        if (!terminalsSet.has(id)) removeTerminal(id)
-      for (const id of terminalsSet) addTerminal(id)
-      break
+    if (!handlerRegistered) {
+      handlerRegistered = true
+      socketMsgHandlerReg((text) => {
+        const payload = text.substring(1)
+        switch (text[0]) {
+        case 'L': {
+          const terminalsSet = new Set(payload ? payload.split(',') : [])
+          for (const id in terminals)
+            if (!terminalsSet.has(id)) removeTerminal(id)
+          for (const id of terminalsSet) addTerminal(id)
+          break
+        }
+        case 'S':
+          if (payload[0] === 'E') {
+            targetBaseEnr = +payload.substring(1) / 100
+          } else if (payload[0] === 'N') {
+            getDirector().replaceScene(sceneIdle())
+            return [undefined, true]
+          } else if (text[1] === 'I') {
+            getDirector().replaceScene(sceneIntro())
+            return [undefined, true]
+          } else {
+            return text
+          }
+          break
+        default:
+          return text
+        }
+      })
     }
-    case 'S':
-      if (payload[0] === 'E') {
-        targetBaseEnr = +payload.substring(1) / 100
-      }
-      break
-    }
-  })
+  }
 
   return {
     update,
