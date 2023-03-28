@@ -113,6 +113,7 @@ const reconnect = () => {
         ))
       } else if (text[1] === 'N') {
         moreRetries = false
+        socket.close()
         currentSizeGroup = undefined
       } else {
         currentSizeGroup = undefined
