@@ -75,9 +75,9 @@ export default () => {
   const sGirl = ['girl-1', 'girl-2', 'girl-3'].map(spriteHere)
   const sSpikesFixed1 = spriteHere('spikes-1-1')
   sSpikesFixed1.opacity = 0.05
-  sSpikesFixed1.setBasedScale(1.2)
+  sSpikesFixed1.setBasedScale(1.4)
   sSpikesFixed1.translation.y = H / 2 +
-    (sSpikesFixed1.basedH * (1 - 1.2)) * (spikesAnchor - 0.5)
+    (sSpikesFixed1.basedH * (1 - 1.4)) * (spikesAnchor - 0.5)
   const sSpikesFixed2 = spriteHere('spikes-2-1')
   const sSpikes = ['spikes-1-', 'spikes-2-', 'spikes-3-'].map((s) => (
     [1, 2, 3].map((n) => spriteHere(s + n))
@@ -171,7 +171,7 @@ export default () => {
       for (let j = 0; j < 3; j++)
         sSpikes[i][j].visible = (i === sSpikesSizeIndex && j === sSpikesFrameIndex)
     const sSpikesCur = sSpikes[sSpikesSizeIndex][sSpikesFrameIndex]
-    const spikesScaleReal = 1.09 + (bubbleScaleReal - 1) * 0.6
+    const spikesScaleReal = 1.3 + (bubbleScaleReal - 1) * 1.1
     const spikesScale = Math.round(spikesScaleReal * 20) / 20
     sSpikesCur.setBasedScale(spikesScale)
     sSpikesCur.translation.y = H / 2 +
