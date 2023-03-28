@@ -14,7 +14,7 @@ export default () => {
     s.translation.y = H / 2
     return s
   }
-  const seq = [1, 2, 3, 4].map((n) => spriteHere('intro-' + n))
+  const seq = [1, 2, 3].map((n) => spriteHere('intro-' + n))
 
   const disp = (index) => {
     for (let i = 0; i < seq.length; i++) seq[i].visible = (i === index)
@@ -24,10 +24,12 @@ export default () => {
   let handlerRegistered = false
   let T = 0
   let signalSent = false
+  const FRAME_DUR = 600
+  const END_DELAY = 480
   const update = function () {
     T = T + 1
-    const index = Math.floor(T / 400)
-    if (!signalSent && index >= seq.length) {
+    const index = Math.floor(T / FRAME_DUR)
+    if (!signalSent && T >= seq.length * FRAME_DUR + END_DELAY) {
       signalSent = true
       socketMsgSend('F')
     }

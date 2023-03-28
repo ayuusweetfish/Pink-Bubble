@@ -71,7 +71,6 @@ loadImages([
   'intro-1',
   'intro-2',
   'intro-3',
-  'intro-4',
   'girl-1',
   'girl-2',
   'girl-3',
