@@ -23,19 +23,20 @@ const roughSpotSvg = (uuid, size, frameIndex) => {
   const svgRoot = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   let seed = cyrb53(uuid, 221)
   const randNext = () => {
-    seed = Math.imul(seed, 1103515245, 12345)
+    seed = Math.imul(seed, 1103515245) + 12345
     return seed & 0x7fffffff
   }
   let r, g, b
   while (true) {
-    r = randNext() % 127 + 128
-    g = randNext() % 127 + 128
-    b = randNext() % 127 + 128
+    r = randNext() % 128 + 128
+    g = randNext() % 256
+    b = randNext() % 160 + 96
     if (
       Math.max(r, g, b) - Math.min(r, g, b) >= 20 &&
-      (r + g) / 2 >= b * 0.8 &&
-      Math.pow(r / 255, 1/2.2) * 0.2126 + Math.pow(g / 255, 1/2.2) * 0.7152 + Math.pow(b / 255, 1/2.2) * 0.0722 >= 0.7 &&
-      Math.pow(r / 255, 1/2.2) * 0.2126 + Math.pow(g / 255, 1/2.2) * 0.7152 + Math.pow(b / 255, 1/2.2) * 0.0722 <= 0.8
+      Math.min(r, g, b) === g &&
+      Math.max(r, g, b) === b &&
+      Math.pow(r / 255, 1/2.2) * 0.2126 + Math.pow(g / 255, 1/2.2) * 0.7152 + Math.pow(b / 255, 1/2.2) * 0.0722 >= 0.87 &&
+      Math.pow(r / 255, 1/2.2) * 0.2126 + Math.pow(g / 255, 1/2.2) * 0.7152 + Math.pow(b / 255, 1/2.2) * 0.0722 <= 0.92
     )
       break
   }
@@ -44,6 +45,8 @@ const roughSpotSvg = (uuid, size, frameIndex) => {
   svgRoot.appendChild(roughSvg.circle(0, 0, size, {
     fill: `#${[r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('')}`,
     fillStyle: 'zigzag',
+    stroke: `#${[r, g, b].map((x) => Math.floor(x * 0.6).toString(16).padStart(2, '0')).join('')}`,
+    strokeWidth: 1.5,
     seed: cyrb53(uuid, frameIndex) + 1,
   }))
   return svgRoot
