@@ -1,5 +1,6 @@
 import { createSprite, socketMsgHandlerReg, socketMsgSend } from './utils.js'
 import { getDirector } from './director.js'
+import { getAudio } from './audio.js'
 import sceneIdle from './scene-idle.js'
 import sceneMain from './scene-main.js'
 
@@ -24,18 +25,22 @@ export default () => {
   let handlerRegistered = false
   let T = 0
   let signalSent = false
-  const FRAME_DUR = 600
+  const FRAME_DUR = (240 * 60) / 84 * 3
+  const START_DELAY = (240 * 60) / 80 * 1
   const END_DELAY = 480
   const update = function () {
     T = T + 1
-    const index = Math.floor(T / FRAME_DUR)
-    if (!signalSent && T >= seq.length * FRAME_DUR + END_DELAY) {
+    const index = Math.floor((T - START_DELAY) / FRAME_DUR)
+    if (!signalSent && T >= seq.length * FRAME_DUR + START_DELAY + END_DELAY) {
       signalSent = true
       socketMsgSend('F')
     }
     disp(index)
 
     if (!handlerRegistered) {
+      getAudio('Blumenlied').play(true, 60000 / 84 * 3 * 16)
+      getAudio('Blumenlied').volume(1)
+
       handlerRegistered = true
       socketMsgHandlerReg((text) => {
         if (text[0] === 'S') {

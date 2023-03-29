@@ -1,5 +1,6 @@
 import { loadImages, socketStartConnection } from './utils.js'
 import { getDirector } from './director.js'
+import { preloadAudios } from './audio.js'
 import sceneIdle from './scene-idle.js'
 
 const twoElement = document.getElementById('draw')
@@ -66,7 +67,7 @@ two.bind('update', update).play()
 }
 
 const loadingElement = document.getElementById('loading')
-loadImages([
+const imageNames = [
   'qr',
   'intro-1',
   'intro-2',
@@ -86,7 +87,18 @@ loadImages([
   'spikes-3-1',
   'spikes-3-2',
   'spikes-3-3',
-], function (count, total) {
+]
+const imageTotal = imageNames.length
+let imageCount = 0
+const audioNames = [
+  ['res/Blumenlied.mp3'],
+]
+const audioTotal = audioNames.length
+let audioCount = 0
+const total = imageTotal + audioTotal
+
+const updateLoadingStatus = () => {
+  const count = imageCount + audioCount
   loadingElement.style.fontSize = `${document.body.clientHeight * 0.03}px`
   loadingElement.innerText = `加载中~ (${Math.round(count / total * 100)}%)`
   if (count === total) {
@@ -94,5 +106,14 @@ loadImages([
     twoElement.style.display = ''
     _fn()
   }
+}
+
+loadImages(imageNames, (count) => {
+  imageCount = count
+  updateLoadingStatus()
+})
+preloadAudios(audioNames, (count) => {
+  audioCount = count
+  updateLoadingStatus()
 })
 socketStartConnection()
