@@ -13,8 +13,15 @@ export default () => {
   bg.stroke = 'none'
   group.add(bg)
 
+  const text = new Two.Text('请点击以开始', W / 2, H / 2)
+  text.size = Math.min(W, H) / 20
+  text.fill = '#684450'
+  group.add(text)
+  let pointerInteracted = false
+
   let handlerRegistered = false
   const update = function () {
+    if (!pointerInteracted) return
     if (!handlerRegistered) {
       getAudio('Blumenlied').stop()
       pinkNoise(0, true)
@@ -45,10 +52,16 @@ export default () => {
   const qr = createSprite('qr-inv', w)
   qr.translation.x = w * 0.55
   qr.translation.y = H - w * 0.55
-  group.add(qr)
+
+  const ptRelease = (id, x, y) => {
+    pointerInteracted = true
+    text.remove()
+    group.add(qr)
+  }
 
   return {
     update,
+    ptRelease,
     group,
   }
 }
