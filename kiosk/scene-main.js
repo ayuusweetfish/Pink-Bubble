@@ -1,7 +1,7 @@
 import { createSprite, socketMsgHandlerReg } from './utils.js'
 import { getDirector } from './director.js'
 import { getAudio, pinkNoise } from './audio.js'
-import sceneIdle from './scene-idle.js'
+import sceneFall from './scene-fall.js'
 import sceneIntro from './scene-intro.js'
 
 const cyrb53 = (str, seed = 0) => {
@@ -236,8 +236,7 @@ export default () => {
             getAudio('Blumenlied').fade(undefined, x * Math.sqrt(x), 0.2)
             pinkNoise((1 - x) * 0.12)
           } else if (payload[0] === 'N') {
-            getDirector().replaceScene(sceneIdle())
-            getAudio('Whip').play()
+            getDirector().replaceScene(sceneFall())
             return [undefined, true]
           } else if (text[1] === 'I') {
             getDirector().replaceScene(sceneIntro())

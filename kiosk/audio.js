@@ -153,6 +153,7 @@ export const pinkNoise = (vol, hard) => {
   const g = pinkNoiseGainNode.gain
   const t = audioCtx.currentTime
   if (hard) {
+    g.cancelScheduledValues(t)
     g.setValueAtTime(vol, t)
   } else {
     g.setValueAtTime(g.value, t)
