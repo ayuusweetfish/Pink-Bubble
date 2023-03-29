@@ -4,6 +4,8 @@ import { getAudio, pinkNoise } from './audio.js'
 import sceneIntro from './scene-intro.js'
 import sceneMain from './scene-main.js'
 
+let pointerInteracted = false
+
 export default () => {
   const [W, H] = getDirector().dims
   const group = new Two.Group()
@@ -17,7 +19,6 @@ export default () => {
   text.size = Math.min(W, H) / 20
   text.fill = '#684450'
   group.add(text)
-  let pointerInteracted = false
 
   let handlerRegistered = false
   const update = function () {
@@ -53,10 +54,16 @@ export default () => {
   qr.translation.x = w * 0.55
   qr.translation.y = H - w * 0.55
 
-  const ptRelease = (id, x, y) => {
-    pointerInteracted = true
+  let ptRelease
+  if (pointerInteracted) {
     text.remove()
     group.add(qr)
+  } else {
+    ptRelease = (id, x, y) => {
+      pointerInteracted = true
+      text.remove()
+      group.add(qr)
+    }
   }
 
   return {

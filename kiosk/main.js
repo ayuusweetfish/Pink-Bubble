@@ -88,6 +88,13 @@ const imageNames = [
   'spikes-3-1',
   'spikes-3-2',
   'spikes-3-3',
+  'fall-1',
+  'fall-2',
+  'fall-3',
+  'fall-4',
+  'fall-5',
+  'fall-6',
+  'fall-7',
 ]
 const imageTotal = imageNames.length
 let imageCount = 0
