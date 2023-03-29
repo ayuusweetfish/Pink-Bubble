@@ -64,6 +64,12 @@ export default () => {
     }
   }
 
+  const w = Math.min(W, H) * 0.3
+  const qr = createSprite('qr', w)
+  qr.translation.x = w * 0.55
+  qr.translation.y = H - w * 0.55
+  group.add(qr)
+
   return {
     update,
     group,

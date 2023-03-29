@@ -69,6 +69,7 @@ two.bind('update', update).play()
 const loadingElement = document.getElementById('loading')
 const imageNames = [
   'qr',
+  'qr-inv',
   'intro-1',
   'intro-2',
   'intro-3',

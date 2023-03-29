@@ -8,6 +8,11 @@ export default () => {
   const [W, H] = getDirector().dims
   const group = new Two.Group()
 
+  const bg = new Two.Rectangle(W / 2, H / 2, W, H)
+  bg.fill = '#8a5a6a'
+  bg.stroke = 'none'
+  group.add(bg)
+
   let handlerRegistered = false
   const update = function () {
     if (!handlerRegistered) {
@@ -37,7 +42,7 @@ export default () => {
   }
 
   const w = Math.min(W, H) * 0.3
-  const qr = createSprite('qr', w)
+  const qr = createSprite('qr-inv', w)
   qr.translation.x = w * 0.55
   qr.translation.y = H - w * 0.55
   group.add(qr)
