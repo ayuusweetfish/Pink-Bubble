@@ -1,6 +1,6 @@
 import { createSprite, socketMsgHandlerReg } from './utils.js'
 import { getDirector } from './director.js'
-import { getAudio } from './audio.js'
+import { getAudio, pinkNoise } from './audio.js'
 import sceneIdle from './scene-idle.js'
 import sceneIntro from './scene-intro.js'
 
@@ -215,7 +215,8 @@ export default () => {
 
     if (!handlerRegistered) {
       getAudio('Blumenlied').play(true, 60000 / 84 * 3 * 16)
-      getAudio('Blumenlied').volume(1)
+      getAudio('Blumenlied').fade(undefined, 1, 0.2)
+      pinkNoise(0)
 
       handlerRegistered = true
       socketMsgHandlerReg((text) => {
@@ -231,8 +232,12 @@ export default () => {
         case 'S':
           if (payload[0] === 'E') {
             targetBaseEnr = +payload.substring(1) / 100
+            const x = Math.sqrt(Math.min(1, targetBaseEnr))
+            getAudio('Blumenlied').fade(undefined, x * Math.sqrt(x), 0.2)
+            pinkNoise((1 - x) * 0.12)
           } else if (payload[0] === 'N') {
             getDirector().replaceScene(sceneIdle())
+            getAudio('Whip').play()
             return [undefined, true]
           } else if (text[1] === 'I') {
             getDirector().replaceScene(sceneIntro())

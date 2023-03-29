@@ -1,6 +1,6 @@
 import { createSprite, socketMsgHandlerReg, socketMsgSend } from './utils.js'
 import { getDirector } from './director.js'
-import { getAudio } from './audio.js'
+import { getAudio, pinkNoise } from './audio.js'
 import sceneIdle from './scene-idle.js'
 import sceneMain from './scene-main.js'
 
@@ -40,6 +40,7 @@ export default () => {
     if (!handlerRegistered) {
       getAudio('Blumenlied').play(true, 60000 / 84 * 3 * 16)
       getAudio('Blumenlied').volume(1)
+      pinkNoise(0, true)
 
       handlerRegistered = true
       socketMsgHandlerReg((text) => {

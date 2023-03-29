@@ -1,6 +1,6 @@
 import { createSprite, socketMsgHandlerReg } from './utils.js'
 import { getDirector } from './director.js'
-import { getAudio } from './audio.js'
+import { getAudio, pinkNoise } from './audio.js'
 import sceneIntro from './scene-intro.js'
 import sceneMain from './scene-main.js'
 
@@ -12,6 +12,7 @@ export default () => {
   const update = function () {
     if (!handlerRegistered) {
       getAudio('Blumenlied').stop()
+      pinkNoise(0, true)
 
       handlerRegistered = true
       socketMsgHandlerReg((text) => {

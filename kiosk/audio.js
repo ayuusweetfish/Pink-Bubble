@@ -94,8 +94,9 @@ const createSound = (urls) => {
     if (!s[id]) return
     const g = s[id].nGain.gain
     const t = audioCtx.currentTime
+    if (from === undefined) from = g.value
     g.setValueAtTime(from, t)
-    g.linearRampToValueAtTime(to, t + dur / 1000)
+    g.linearRampToValueAtTime(to, t + dur)
   }
   o.rate = (rate) => {
     // Only overall setting is necessary, and only applies to new instances
@@ -118,3 +119,43 @@ export const preloadAudios = (paths, callback) => {
 }
 
 export const getAudio = (name) => audios[name]
+
+let pinkNoiseNode, pinkNoiseGainNode
+export const pinkNoise = (vol, hard) => {
+  if (!pinkNoiseNode) {
+    // https://noisehack.com/generate-noise-web-audio-api/
+    const bufferSize = 4096
+    let b0, b1, b2, b3, b4, b5, b6
+    b0 = b1 = b2 = b3 = b4 = b5 = b6 = 0.0
+    const node = audioCtx.createScriptProcessor(bufferSize, 1, 1)
+    node.onaudioprocess = (e) => {
+      const output = e.outputBuffer.getChannelData(0)
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1
+        b0 = 0.99886 * b0 + white * 0.0555179
+        b1 = 0.99332 * b1 + white * 0.0750759
+        b2 = 0.96900 * b2 + white * 0.1538520
+        b3 = 0.86650 * b3 + white * 0.3104856
+        b4 = 0.55000 * b4 + white * 0.5329522
+        b5 = -0.7616 * b5 - white * 0.0168980
+        output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362
+        output[i] *= 0.11  // (roughly) compensate for gain
+        b6 = white * 0.115926
+      }
+    }
+    const nGain = audioCtx.createGain()
+    node.connect(nGain)
+    nGain.connect(audioCtx.destination)
+    nGain.gain.setValueAtTime(0, audioCtx.currentTime)
+    pinkNoiseNode = node
+    pinkNoiseGainNode = nGain
+  }
+  const g = pinkNoiseGainNode.gain
+  const t = audioCtx.currentTime
+  if (hard) {
+    g.setValueAtTime(vol, t)
+  } else {
+    g.setValueAtTime(g.value, t)
+    g.linearRampToValueAtTime(vol, t + 0.2)
+  }
+}

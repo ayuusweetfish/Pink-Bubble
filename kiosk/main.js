@@ -92,6 +92,7 @@ const imageTotal = imageNames.length
 let imageCount = 0
 const audioNames = [
   ['res/Blumenlied.mp3'],
+  ['res/Whip.wav'],
 ]
 const audioTotal = audioNames.length
 let audioCount = 0
