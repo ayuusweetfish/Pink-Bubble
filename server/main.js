@@ -42,7 +42,7 @@ let baseEnr
 const restart = () => {
   baseEnr = 102
   const drain = () => {
-    baseEnr -= 3
+    baseEnr -= 4
     const totalEnr = baseEnr + Math.round(Math.sqrt(terminalSockets.size) * 20)
     if (totalEnr <= 0) {
       interactionStatus = 'N'

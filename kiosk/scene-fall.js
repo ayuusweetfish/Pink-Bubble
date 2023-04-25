@@ -45,6 +45,7 @@ export default () => {
     if (!handlerRegistered) {
       getAudio('Blumenlied').stop()
       pinkNoise(0, true)
+      getAudio('Whip').volume(3)
       getAudio('Whip').play()
 
       handlerRegistered = true

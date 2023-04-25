@@ -25,15 +25,15 @@ export default () => {
   let handlerRegistered = false
   let T = 0
   let signalSent = false
-  const FRAME_DUR = (240 * 60) / 84 * 3
+  const FRAME_DUR = (240 * 60) / 84 * 6
   const START_DELAY = (240 * 60) / 80 * 1
   const END_DELAY = 480
   const update = function () {
-    if (T === 0) socketMsgSend('F')
     T = T + 1
     const index = Math.floor((T - START_DELAY) / FRAME_DUR)
     if (!signalSent && T >= seq.length * FRAME_DUR + START_DELAY + END_DELAY) {
       signalSent = true
+      socketMsgSend('F')
     }
     disp(index)
 
